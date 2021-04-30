@@ -4,7 +4,7 @@ const { uuid } = require("uuidv4")
 require("dotenv").config()
 
 var storage = multer.diskStorage({
-	destination: path.join(__dirname, "../public/uploads"),
+	destination: path.join(__dirname, "../uploads"),
 	filename: (req, file, cb) => {
 		const extension = file.originalname.split(".").pop()
 		req.extension=extension
@@ -12,4 +12,4 @@ var storage = multer.diskStorage({
 	}
 });
 
-exports.upload = multer({ storage, dest: path.join(__dirname, "../public/uploads") })
+exports.upload = multer({ storage, dest: path.join(__dirname, "../uploads") })

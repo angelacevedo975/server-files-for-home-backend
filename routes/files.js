@@ -1,14 +1,19 @@
 const express = require("express")
-const { uploadFile, filesList, removeFile, validateFileExisting, removeFilePermanentlyDB, removeFilePermanentlyFromHost } = require("../controllers/files")
+const { uploadFile, filesList, removeFile, validateFileExisting, removeFilePermanentlyDB, removeFilePermanentlyFromHost, downloadFile } = require("../controllers/files")
 const { upload } = require("../multer/multer")
-
+const path = require("path")
 
 const router = express.Router()
 
 
 router.get("/", filesList)
 
-router.delete("/remove",
+router.get("/download/:filename",
+	validateFileExisting,
+	downloadFile
+)
+
+router.post("/remove/:filename",
 	validateFileExisting,
 	removeFile
 )

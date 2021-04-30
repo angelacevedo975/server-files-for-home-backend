@@ -3,11 +3,19 @@ const fs = require("fs")
 const path = require("path")
 require("dotenv").config()
 
+exports.downloadFile = (req, res) => {
+	try {
+		return res.sendFile(path.join(__dirname, `../uploads/${req.dbFile.name}`))
+	} catch (e) {
+		return res.json({ error: JSON.stringify(e) })
+	}
+}
+
 exports.uploadFile = (req, res) => {
 	let files = req.files.file.map((file, index) => {
 		return {
 			name: file.filename,
-			path: `${process.env.HOST}:${process.env.PORT}${process.env.STATIC}/${file.filename}`,
+			path: `${process.env.HOST}:${process.env.PORT}/file/download/${file.filename}`,
 			extension: req.extension
 		}
 	})
@@ -32,8 +40,9 @@ exports.filesList = (req, res) => {
 }
 
 exports.validateFileExisting = (req, res, next) => {
+	const filename = req.body.filename ? req.body.filename : req.params.filename
 	File.findOne({
-		name: req.body.filename
+		name: filename
 	}, (err, file) => {
 		if (err) {
 			return res.json({ error: err })
@@ -41,13 +50,15 @@ exports.validateFileExisting = (req, res, next) => {
 		if (!file) {
 			return res.json({ error: "The file was not found" })
 		}
+		req.dbFile = file
 		next()
 	})
 }
 
 exports.removeFile = (req, res) => {
+	const filename = req.body.filename ? req.body.filename : req.params.filename
 	File.findOneAndUpdate({
-		name: req.body.filename
+		name: filename
 	}, {
 		status: "DELETE"
 	}, (err, doc) => {
@@ -71,7 +82,7 @@ exports.removeFilePermanentlyDB = (req, res, next) => {
 }
 
 exports.removeFilePermanentlyFromHost = (req, res) => {
-	const route = path.join(__dirname, `../public/uploads/${req.deletedFile.name}`)
+	const route = path.join(__dirname, `../uploads/${req.deletedFile.name}`)
 	fs.unlink(route, (err) => {
 		if (err) {
 			return res.json({ error: err })

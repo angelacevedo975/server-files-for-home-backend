@@ -28,7 +28,7 @@ app.use(express.static(__dirname + "/public"))
 
 
 // CORS
-var allowedOrigins = ['http://localhost:3000'];
+var allowedOrigins = ['https://server-files.herokuapp.com', "http://localhost:3000"];
 var corsOptions = {
 	origin: function (origin, callback) {
 		// allow requests with no origin     
@@ -50,6 +50,6 @@ app.use("/file", files)
 
 
 
-app.listen(process.env.PORT || 3005, process.env.HOST || "localhost", () => {
-	console.log(`Listening on ${process.env.HOST || 3005} - ${process.env.PORT || "localhost"}`);
+app.listen(process.env.PORT || 3005,  () => {
+	console.log(`Listening on ${process.env.PORT || "3005"}`);
 });

@@ -15,7 +15,7 @@ exports.uploadFile = (req, res) => {
 	let files = req.files.file.map((file, index) => {
 		return {
 			name: file.filename,
-			path: `${process.env.HOST}:${process.env.PORT}/file/download/${file.filename}`,
+			path: `${process.env.HOSTNAME}/file/download/${file.filename}`,
 			extension: req.extension
 		}
 	})

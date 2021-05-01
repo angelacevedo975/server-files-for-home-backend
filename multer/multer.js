@@ -12,4 +12,4 @@ var storage = multer.diskStorage({
 	}
 });
 
-exports.upload = multer({ storage, dest: path.join(__dirname, "../uploads") })
+//exports.upload = multer({ storage, dest: path.join(__dirname, "../uploads") })

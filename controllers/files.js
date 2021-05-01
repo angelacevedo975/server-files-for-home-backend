@@ -1,31 +1,43 @@
 const { File } = require("../models/File");
 const fs = require("fs")
-const path = require("path")
+const cloudinary = require("cloudinary")
 require("dotenv").config()
 
-exports.downloadFile = (req, res) => {
-	try {
-		return res.sendFile(path.join(__dirname, `../uploads/${req.dbFile.name}`))
-	} catch (e) {
-		return res.json({ error: JSON.stringify(e) })
-	}
+
+cloudinary.config({
+	cloud_name: process.env.CLOUDNAME,
+	api_key: process.env.APIKEY,
+	api_secret: process.env.APISECRET,
+});
+
+
+
+exports.uploadFileToHost = (req, res, next) => {
+	const file = req.file;
+	cloudinary.v2.uploader.upload(file.path,
+		{ folder: "home-files", resource_type: "auto" },
+		(err, fileResponse) => {
+			if (err) {
+				return res.json({ error: "An error has ocurred while uploading" })
+			}
+			req.fileResponse = fileResponse
+			next()
+		}
+	)
 }
 
-exports.uploadFile = (req, res) => {
-	let files = req.files.file.map((file, index) => {
-		return {
-			name: file.filename,
-			path: `${process.env.HOSTNAME}/file/download/${file.filename}`,
-			extension: req.extension
-		}
+exports.uploadFileToDB = (req, res) => {
+	const file = new File({
+		name: `${req.fileResponse.original_filename}.${req.fileResponse.format}`,
+		path: req.fileResponse.secure_url,
+		extension: req.fileResponse.format,
 	})
-	File.insertMany(files)
-		.then((doc) => {
-			return res.json(doc)
-		})
-		.catch((err) => {
-			return res.json({ error: err })
-		})
+	file.save((err, uploadedFile) => {
+		if (err) {
+			return res.json({ error: "An error has ocurred while uploading the file" })
+		}
+		return res.json(uploadedFile)
+	})
 }
 
 exports.filesList = (req, res) => {
